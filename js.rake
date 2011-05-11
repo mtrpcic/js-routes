@@ -20,9 +20,8 @@ namespace :js do
 end
 
 def generate_method(name, path)
-  compare = /:(.*?)\//
-  path = "#{path}/" unless path =~ /\/$/
-  path.sub!(compare, "' + params.#{$1} + '/") while path =~ compare
+  compare = /:(.*?)(\/|$)/
+  path.sub!(compare, "' + params.#{$1} + '#{$2}") while path =~ compare
   return "function #{name}(params){ return '#{path}'}"
 end
 
