@@ -4,7 +4,7 @@ js:routes is a simple `rake task` that gives you access to your Rails routes on 
 
 # Features #
 * Lightweight
-* Compatible with Rails 2.x.x and 3.x.x
+* Compatible with Rails 3.1.x
 * Generates vanilla JavaScript - no external library requirements
 * Supports setting custom filename
 
@@ -39,7 +39,7 @@ For example, let's say you have a `NotesController` with an update action.  You 
 You'll notice the inelegant way that the route is being constructed.  js:routes alleviates this by providing your Rails routes.  The above code becomes much more elegant:
 
     $.ajax({
-        url: note_path({id: post_id})
+        url: Paths.note({id: post_id})
         method: 'PUT',
         data:{
             x: post_x,
