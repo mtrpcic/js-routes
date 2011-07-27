@@ -21,8 +21,21 @@ end
 
 def generate_method(name, path)
   compare = /:(.*?)(\/|$)/
-  path.sub!(compare, "' + params.#{$1} + '#{$2}") while path =~ compare
-  return "function #{name}(params){ return '#{path}'}"
+  path.sub!(compare, "' + options.params.#{$1} + '#{$2}") while path =~ compare
+  
+  js_func = %{
+  function #{name}_path(options){
+    if(options && options.data) {
+      var op_params = []
+      for(var key in options.data){
+        op_params.push([key, options.data[key]].join('='));
+      }
+      return '#{path}?' + op_params.join('&');
+    }else {
+      return '#{path}'
+    }
+  }}
+  return js_func
 end
 
 def generate_routes_for_rails_2
