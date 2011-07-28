@@ -21,7 +21,7 @@ end
 
 def generate_method(name, path)
   compare = /:(.*?)(\/|$)/
-  path.sub!(compare, "' + options.params.#{$1} + '#{$2}") while path =~ compare
+  path.sub!(compare, "' + params.#{$1} + '#{$2}") while path =~ compare
   
   js_func = %{
   function #{name}_path(options){
@@ -30,8 +30,13 @@ def generate_method(name, path)
       for(var key in options.data){
         op_params.push([key, options.data[key]].join('='));
       }
+      var params = options.params;
       return '#{path}?' + op_params.join('&');
+    }else if(options && options.params) {
+      var params = options.params;
+      return '#{path}'
     }else {
+      var params = options;
       return '#{path}'
     }
   }}
