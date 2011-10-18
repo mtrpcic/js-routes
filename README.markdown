@@ -18,10 +18,11 @@ js:routes is a single file you can place into your `lib/tasks` directory to give
     # You can generate your routes file by doing the following:
     rake js:routes
 
-    # The above commands will place the routes in your_app/public/javascripts/rails_routes.js
+    # The above commands will place the routes in your_app/app/assets/javascripts/rails_routes.js
     # You can specify your own filename like so:
 
     rake js:routes[custom_name.js]
+    # The above commands will place the routes in your_app/app/assets/javascripts/custom_name.js
 
 # What does this change? ##
 
