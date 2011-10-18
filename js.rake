@@ -5,7 +5,7 @@ namespace :js do
       puts "Your Rails version is not supported."
       exit 1
     end
-    
+
     filename = args[:filename].blank? ? "rails_routes.js" : args[:filename]
     save_path = "#{Rails.root}/app/assets/javascripts/#{filename}"
 
@@ -15,7 +15,7 @@ namespace :js do
     javascript << routes.map do |route|
       generate_method(route[:name], route[:path])
     end.join(",\n")
-    
+
     javascript << "\n};";
 
     File.open(save_path, "w") { |f| f.write(javascript) }
