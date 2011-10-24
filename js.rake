@@ -1,18 +1,22 @@
 desc "Generate a JavaScript file that contains your Rails routes"
 namespace :js do
-  task :routes, :filename, :needs => :environment do |t, args|
-    filename = args[:filename].blank? ? "rails_routes.js" : args[:filename]
-    save_path = "#{RAILS_ROOT}/public/javascripts/#{filename}"
-    if Rails.version >= "3.0.0"
-      routes = generate_routes_for_rails_3
-    else
-      routes = generate_routes_for_rails_2
+  task :routes, [:filename] => [:environment] do |t, args|
+    if Rails.version < "3.1.0"
+      puts "Your Rails version is not supported."
+      exit 1
     end
 
-    javascript = ""
-    routes.each do |route|
-        javascript << generate_method(route[:name], route[:path]) + "\n"
-    end
+    filename = args[:filename].blank? ? "rails_routes.js" : args[:filename]
+    save_path = "#{Rails.root}/app/assets/javascripts/#{filename}"
+
+    routes = generate_routes
+
+    javascript = "var Paths = {\n";
+    javascript << routes.map do |route|
+      generate_method(route[:name], route[:path])
+    end.join(",\n")
+
+    javascript << "\n};";
 
     File.open(save_path, "w") { |f| f.write(javascript) }
     puts "Routes saved to #{save_path}."
@@ -22,26 +26,14 @@ end
 def generate_method(name, path)
   compare = /:(.*?)(\/|$)/
   path.sub!(compare, "' + params.#{$1} + '#{$2}") while path =~ compare
-  return "function #{name}(params){ return '#{path}'}"
+  return "\t#{name}: function(params) {return '#{path}';}"
 end
 
-def generate_routes_for_rails_2
-  processed_routes = []
-  ActionController::Routing::Routes.routes.each do |route|
-    name = ActionController::Routing::Routes.named_routes.routes.index(route)
-    segs = route.segments.inject("") {|str, s| str << s.to_s}
-    segs.chop! if segs.length > 1
-    processed_routes << {:name => name, :path => segs.split("(")[0]} unless name.nil?
-  end
-  return processed_routes
-end
-
-def generate_routes_for_rails_3
+def generate_routes
   Rails.application.reload_routes!
   processed_routes = []
   Rails.application.routes.routes.each do |route|
-    processed_routes << {:name => route.name + "_path", :path => route.path.split("(")[0]} unless route.name.nil?
+    processed_routes << {:name => route.name.camelize(:lower), :path => route.path.split("(")[0]} unless route.name.nil?
   end
   return processed_routes
 end
-
