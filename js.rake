@@ -58,7 +58,7 @@ def generate_routes_for_rails_3
   Rails.application.reload_routes!
   processed_routes = []
   Rails.application.routes.routes.each do |route|
-    processed_routes << {:name => route.name + "_path", :path => route.path.split("(")[0]} unless route.name.nil?
+    processed_routes << {:name => route.name, :path => route.path.split("(")[0]} unless route.name.nil?
   end
   return processed_routes
 end
