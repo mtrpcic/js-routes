@@ -1,11 +1,12 @@
 desc "Generate a JavaScript file that contains your Rails routes"
 namespace :js do
-  task :routes, :filename, :needs => :environment do |t, args|
+  task :routes, [:filename] => :environment do |t, args|
     filename = args[:filename].blank? ? "rails_routes.js" : args[:filename]
-    save_path = "#{RAILS_ROOT}/public/javascripts/#{filename}"
     if Rails.version >= "3.0.0"
+      save_path = "#{Rails.root}/app/assets/javascripts/#{filename}"
       routes = generate_routes_for_rails_3
     else
+      save_path = "#{RAILS_ROOT}/public/javascripts/#{filename}"
       routes = generate_routes_for_rails_2
     end
 
@@ -58,7 +59,7 @@ def generate_routes_for_rails_3
   Rails.application.reload_routes!
   processed_routes = []
   Rails.application.routes.routes.each do |route|
-    processed_routes << {:name => route.name, :path => route.path.split("(")[0]} unless route.name.nil?
+    processed_routes << {:name => route.name, :path => route.path.spec.to_s.split("(")[0]} unless route.name.nil?
   end
   return processed_routes
 end
